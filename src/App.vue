@@ -86,9 +86,6 @@ function deleteLocalStorage() {
 }
 </script>
 
-
-
-
 <template>
   <v-app>
     <Header
@@ -96,10 +93,14 @@ function deleteLocalStorage() {
     />
     <v-main>
       <v-container>
-        <router-view
-        :books="books"
-        @add-book-list="addBook"
-        @update-book-info="updateBookInfo"/>
+        <router-view v-slot="{ Component }">
+          <component
+            :is="Component"
+            :books="books"
+            @add-book-list="addBook"
+            @update-book-info="updateBookInfo"
+          />
+        </router-view>
       </v-container>
     </v-main>
     <v-footer>
