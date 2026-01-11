@@ -1,14 +1,13 @@
 <template>
   <div class="flex-grow-1"></div>
-  <div>&copy; 2025 - {{ new Date().getFullYear() }} my mannga</div>
+  <div>&copy; 2025 - {{ year }} my manga</div>
 </template>
 
-<script>
-export default {
-
-}
+<script setup>
+const year = new Date().getFullYear()
 </script>
 
-<style>
-
+<style scoped>
 </style>
+
+
