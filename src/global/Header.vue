@@ -44,7 +44,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { SvgIcon } from '@jamescoyle/vue-icon'
+import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiMenu } from '@mdi/js'
 
 // メニューアイコン
