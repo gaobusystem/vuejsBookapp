@@ -3,7 +3,9 @@
     color="gray accent-4"
     dark
   >
-  <v-app-bar-nav-icon></v-app-bar-nav-icon>
+  <v-btn icon color="primary" to="/">
+    <v-icon>mdi-home</v-icon>
+  </v-btn>
   <v-toolbar-title>漫画管理</v-toolbar-title>
   <div class="flex-grow-1"></div>
 
@@ -11,7 +13,7 @@
     <v-icon>mdi-heart</v-icon>
   </v-btn>
 
-  <v-btn icon>
+  <v-btn icon color="primary" to="/search">
     <v-icon>mdi-magnify</v-icon>
   </v-btn>
   <div class="d-flex justify-space-around">
