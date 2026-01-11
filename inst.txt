@@ -1,0 +1,5 @@
+npm install vuetify@latest
+npm install @mdi/font
+npm install vue-router@4
+npm install @jamescoyle/vue-icon
+

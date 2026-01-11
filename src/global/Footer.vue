@@ -1,5 +1,6 @@
 <template>
-  <div>フッター</div>
+  <div class="flex-grow-1"></div>
+  <div>&copy; 2025 - {{ new Date().getFullYear() }} my mannga</div>
 </template>
 
 <script>

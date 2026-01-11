@@ -1,7 +1,5 @@
 <script setup>
 import { ref } from 'vue'
-import Header from '@/global/Header.vue'
-import Footer from '@/global/Footer.vue'
 import FoodCard from './components/FoodCard.vue'
 const foods = ref([
   { name: '寿司', emoji: '🍣' },
@@ -30,27 +28,23 @@ function pickFood(index) {
 </script>
 
 <template>
-  <v-app>
-    <Header
-    @delete-local-storage="deleteLocalStorage"
+  <main>
+    <h1 class="title">今日何食べる？</h1>
+    <FoodCard
+      :name="foods[pickedFoodIndex].name"
+      :emoji="foods[pickedFoodIndex].emoji"
+      @click="pickFood(pickedFoodIndex)"
     />
-    <div>
-
-    </div>
-    <v-container class="text-center" style="max-width: 350px; margin-top: 100px;">
-      <h1 class="mb-10">今日何食べる？</h1>
-
-
-
-
-    </v-container>
-    <v-footer>
-      <Footer/>
-    </v-footer>
-  </v-app>
+    <template v-if="newFoodIndex < foods.length">
+      <p>VS</p>
+      <FoodCard
+        :name="foods[newFoodIndex].name"
+        :emoji="foods[newFoodIndex].emoji"
+        @click="pickFood(newFoodIndex)"
+      />
+    </template>
+  </main>
 </template>
-
-
 
 <style scoped>
 main {

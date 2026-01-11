@@ -1,12 +1,30 @@
-import Vue from 'vue'
+import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
-import vuetify from './plugins/vuetify'
+//import store from './store'
+import 'vuetify/styles'
+import { createVuetify } from 'vuetify'
+import * as components from 'vuetify/components'
+import * as directives from 'vuetify/directives'
+// ★ MDI を読み込む
+import '@mdi/font/css/materialdesignicons.css'
 
-Vue.config.productionTip = false
+const vuetify = createVuetify({
+  components,
+  directives,
+  icons: {
+    defaultSet: 'mdi',
+  },
+})
 
-new Vue({
-  router,
-  vuetify,
-  render: h => h(App)
-}).$mount('#app')
+
+
+const app = createApp(App)
+
+app.use(router)
+//app.use(store)
+app.use(vuetify)
+
+app.mount('#app')
+
+

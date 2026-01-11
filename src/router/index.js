@@ -1,10 +1,7 @@
-import Vue from 'vue'
-import VueRouter from 'vue-router'
-import BookIndex from '@/pages/BookIndex'
-import BookSearch from '@/pages/BookSearch'
-import BookEdit from '@/pages/BookEdit'
-
-Vue.use(VueRouter)
+import { createRouter, createWebHistory } from 'vue-router'
+import BookIndex from '@/pages/BookIndex.vue'
+import BookSearch from '@/pages/BookSearch.vue'
+import BookEdit from '@/pages/BookEdit.vue'
 
 const routes = [
   {
@@ -22,15 +19,15 @@ const routes = [
     name: 'BookEdit',
     component: BookEdit
   },
+  // Vue Router 4 では "*" は使えないので、正規表現に変更
   {
-    path: '*',
+    path: '/:pathMatch(.*)*',
     redirect: '/'
-    },
+  }
 ]
 
-const router = new VueRouter({
-  mode: 'history',
-  base: process.env.BASE_URL,
+const router = createRouter({
+  history: createWebHistory(),
   routes
 })
 
