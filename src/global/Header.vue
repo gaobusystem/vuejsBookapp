@@ -44,8 +44,11 @@
 
 <script setup>
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
 import SvgIcon from '@jamescoyle/vue-icon'
 import { mdiMenu } from '@mdi/js'
+
+const router = useRouter()
 
 // メニューアイコン
 const path = mdiMenu
@@ -53,18 +56,24 @@ const path = mdiMenu
 // メニュー項目
 const items = ref([
   { title: 'Click Me' },
-  { title: 'Click Me' },
+  { title: '設定をダウンロード' },
   { title: '初期データインポート' },
   { title: '登録データをクリア' },
 ])
 
 // emit
-const emit = defineEmits(['delete-local-storage'])
+const emit = defineEmits(['delete-local-storage', 'download-conf'])
 
 // メニュークリック処理
 function onMenuClick(index) {
   if (items.value[index].title === '登録データをクリア') {
     emit('delete-local-storage')
+  }
+  if (items.value[index].title === '設定をダウンロード') {
+    emit('download-conf')
+  }
+  if (items.value[index].title === '初期データインポート') {
+    router.push('/conf-download')
   }
 }
 </script>

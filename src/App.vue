@@ -32,12 +32,15 @@ onMounted(() => {
 // -------------------------
 function addBook(e) {
   books.value.push({
-    id: books.value.length,
+    id: e.id,
     title: e.title,
+    publisher: e.publisher,
+    publishedDate: e.publishedDate,
     image: e.image,
     description: e.description,
     readDate: '',
-    memo: ''
+    memo: '',
+    status:'',
   })
 
   saveBooks()
@@ -84,12 +87,38 @@ function deleteLocalStorage() {
     window.location.reload()
   }
 }
+
+function downloadConf() {
+  console.log(books.value);
+  const saved = localStorage.getItem(STORAGE_KEY)
+
+  if (!saved) {
+    alert('保存データがありません')
+    return
+  }
+// Blob に変換
+  const blob = new Blob([saved], { type: 'application/json' })
+
+  // ダウンロード用 URL を作成
+  const url = URL.createObjectURL(blob)
+
+  // 仮の <a> タグを作ってクリック
+  const a = document.createElement('a')
+  a.href = url
+  a.download = 'books.json'
+  a.click()
+
+  // 後片付け
+  URL.revokeObjectURL(url)
+
+}
 </script>
 
 <template>
   <v-app>
     <Header
     @delete-local-storage="deleteLocalStorage"
+    @download-conf="downloadConf"
     />
     <v-main>
       <v-container>
