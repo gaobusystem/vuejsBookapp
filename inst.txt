@@ -1,5 +1,11 @@
+C:\Users\takab>d:
+
+D:\>cd D:\dev\vuejs\v3\manga
+
+D:\dev\vuejs\v3\manga>npm run dev
+
 npm install vuetify@latest
 npm install @mdi/font
 npm install vue-router@4
 npm install @jamescoyle/vue-icon
-
+npm install pinia
