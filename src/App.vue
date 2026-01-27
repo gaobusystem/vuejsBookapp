@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/global/Header.vue'
 import Footer from '@/global/Footer.vue'
+import Loader from '@/components/Loader.vue'
 
 const STORAGE_KEY = 'books'
 const router = useRouter()
@@ -16,6 +17,7 @@ const newBook = ref(null)
 // -------------------------
 // lifecycle
 // -------------------------
+
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved) {
@@ -31,8 +33,12 @@ onMounted(() => {
 // methods
 // -------------------------
 function addBook(e) {
+  // 現在の最大IDを取得（books が空なら 0）
+  const newId = Math.max(0, ...books.value.map(b => b.id)) + 1
+
   books.value.push({
-    id: e.id,
+    id: newId,
+    bid: e.bid,
     title: e.title,
     publisher: e.publisher,
     publishedDate: e.publishedDate,
@@ -46,8 +52,7 @@ function addBook(e) {
   saveBooks()
 
   // 最後に追加したIDへ遷移
-  const lastId = books.value.slice(-1)[0].id
-  goToEditPage(lastId)
+  goToEditPage(newId)
 }
 
 function removeBook(index) {
@@ -62,10 +67,12 @@ function saveBooks() {
 
 function updateBookInfo(e) {
   const updateInfo = {
-    id: e.id,
-    readDate: e.readDate,
-    memo: e.memo,
+    id: books.value[e.id].id,
     title: books.value[e.id].title,
+    publisher: books.value[e.id].publisher,
+    publishedDate: books.value[e.id].publishedDate,
+    memo: e.memo,
+    readDate: e.readDate,
     image: books.value[e.id].image,
     description: books.value[e.id].description
   }
@@ -120,7 +127,10 @@ function downloadConf() {
     @delete-local-storage="deleteLocalStorage"
     @download-conf="downloadConf"
     />
+    <!-- グローバルローダー -->
+    <Loader />
     <v-main>
+
       <v-container>
         <router-view v-slot="{ Component }">
           <component
@@ -132,6 +142,8 @@ function downloadConf() {
         </router-view>
       </v-container>
     </v-main>
+
+
     <v-footer>
       <Footer/>
     </v-footer>
