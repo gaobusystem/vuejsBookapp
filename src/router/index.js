@@ -18,7 +18,8 @@ const routes = [
   {
     path: '/edit/:id',
     name: 'BookEdit',
-    component: BookEdit
+    component: BookEdit,
+    props: true
   },
   {
     path: '/conf-download',

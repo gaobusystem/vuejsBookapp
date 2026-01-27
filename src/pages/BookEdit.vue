@@ -12,39 +12,38 @@
                 タイトル：{{ book.title }}
               </v-card-title>
               読んだ日：
-               <v-menu
+              <v-menu
                 v-model="menu"
                 :close-on-content-click="false"
                 :nudge-right="40"
-                transition="scale-transition"
-                offset-y
+                :offset="[0, 10]"
                 min-width="290px"
               >
-                <template v-slot:activator="{ on, attrs }">
+                <template #activator="{ props }">
                   <v-text-field
                     v-model="date"
                     readonly
-                    v-bind="attrs"
-                    v-on="on"
-                  ></v-text-field>
+                    v-bind="props"
+                  />
                 </template>
-                <v-date-picker 
-                  v-model="date" 
-                  @input="menu = false"
+
+                <v-date-picker
+                  v-model="date"
+                  @update:model-value="menu = false"
                   locale="jp-ja"
-                  :day-format="date => new Date(date).getDate()">
-                </v-date-picker>
+                  :day-format="d => new Date(d).getDate()"
+                />
               </v-menu>
               感想：<v-textarea
               class="mx-2" v-model="book.memo">
               {{book.memo }}
               </v-textarea>
-              
+
               <v-card-actions>
                 <v-btn color="secondary" to="/">一覧に戻る</v-btn>
-                <v-btn color="info" 
+                <v-btn color="info"
                 @click="updateBookInfo">保存する</v-btn>
-              </v-card-actions> 
+              </v-card-actions>
             </v-col>
           </v-row>
         </v-card>
@@ -54,16 +53,31 @@
 </template>
 
 <script>
+import { useRoute } from 'vue-router'
+import { ref } from 'vue'
+
 export default {
   name:'BookEdit',
   props:{
     books:Array
   },
-  data(){
-    return{
-      book:'',
-      date: '',
-      menu: false,
+  setup(props) {
+    const route = useRoute()
+    const id = Number(route.params.id)
+
+    const book = ref(props.books.find(b => b.id === id))
+
+    const date = ref(book.value?.readDate ?? new Date().toISOString().substr(0, 10))
+    const menu = ref(false)
+
+    const updateBookInfo = () => {
+      // emit は setup では使えないので Options API に移すか defineEmits を使う
+    }
+
+    return {
+      book,
+      date,
+      menu,
     }
   },
   methods:{
@@ -75,20 +89,7 @@ export default {
       })
     }
   },
-  beforeRouteEnter (to, from, next) {
-  next(vm => {
-    // `vm` を通じてコンポーネントインスタンスにアクセス
-    vm.$nextTick(()=>{
-      vm.book = vm.books[vm.$route.params.id]
-      if(vm.book.readDate){
-        vm.date = vm.book.readDate
-      } else {
-        vm.date = new Date().toISOString().substr(0, 10)
-      }
-      // console.log(vm.book)
-    })
-  })
-}
+
 }
 </script>
 
