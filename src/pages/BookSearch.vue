@@ -52,9 +52,11 @@
               <v-card-title class="text-h6">
                 {{ book.title }}
               </v-card-title>
-
               <div class="mb-2">
-                {{ book.description }}
+                {{ book.titleKana }}　著者：{{ book.author }}　出版社：{{ book.publisher }}　
+              </div>
+              <div class="mb-2">
+               発売日：{{ book.publishedDate }}
               </div>
 
               <v-spacer />
@@ -80,7 +82,11 @@
 
 
 <script setup>
-import { ref } from 'vue'
+import { ref,  nextTick } from 'vue'
+import { useLoaderStore } from '@/stores/loader'
+const loader = useLoaderStore()
+
+
 
 // -------------------------
 // state
@@ -101,13 +107,25 @@ function addBookList(index) {
 }
 
 async function search() {
-  searchResults.value = []
 
-  const baseUrl = 'https://www.googleapis.com/books/v1/volumes?'
+  searchResults.value = []
+  loader.show()
+  // UI 更新を待つ（これが重要）
+  //await nextTick()
+
+
+  const baseUrl = 'https://app.rakuten.co.jp/services/api/BooksBook/Search/20170404?'
   const params = {
-    q: `intitle:${keyword.value}`,
-    maxResults: 40
+    applicationId:"1081189654826734250",
+    title: `${keyword.value}`,
+    hits: 30,
+    page: 1,
+    sort:"-releaseDate",
+    formatVersion: 2
   }
+  await new Promise(resolve => setTimeout(resolve, 3000))
+
+  loader.hide()
 
   const queryParams = new URLSearchParams(params)
   console.log("url: " + baseUrl + queryParams)
@@ -116,20 +134,32 @@ async function search() {
   const response = await fetch(baseUrl + queryParams)
     .then(res => res.json())
 
-  console.log(response.items)
+  console.log(response.Items)
 
   // push results
-  for (let book of response.items) {
-    const title = book.volumeInfo.title
-    const img = book.volumeInfo.imageLinks
-    const description = book.volumeInfo.description
+  for (let book of response.Items) {
+    const isbn = book.isbn
+    const title = book.title
+    const titleKana = book.titleKana
+    const author = book.author
+    const publisher = book.publisherName
+    const publishedDate = book.salesDate
+    const img = book.mediumImageUrl
+ //   const description = book.itemCaption
 
     searchResults.value.push({
+      isbn: isbn,
       title: title || '',
-      image: img ? img.thumbnail : '',
-      description: description ? description.slice(0, 40) : ''
+      titleKana: titleKana || '',
+      author: author || '',
+      publisher: publisher || '',
+      publishedDate: publishedDate || '',
+      image: img  || '',
+  //    description: description ? description.slice(0, 40) : ''
     })
   }
+  console.log("searchResults.value")
+  console.log(searchResults.value)
 }
 </script>
 
