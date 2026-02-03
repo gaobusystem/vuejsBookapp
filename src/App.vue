@@ -13,6 +13,9 @@ const router = useRouter()
 // -------------------------
 const books = ref([])
 const newBook = ref(null)
+const snackbar = ref(false)
+const snackbarMessage = ref('')
+
 
 // -------------------------
 // lifecycle
@@ -139,9 +142,14 @@ function downloadConf() {
 function deleteBook(id) {
   const index = books.value.findIndex(b => b.id === id)
   if (index !== -1) {
-    console.log(`削除: id=${id}, title=${books.value[index].title}`)
+    const title = books.value[index].title   // ← これが必要
+
+    console.log(`削除: id=${id}, title=${title}`)
     books.value.splice(index, 1)
     saveBooks()
+
+    snackbarMessage.value = `「${title}」を削除しました`
+    snackbar.value = true
   }
 }
 
@@ -155,6 +163,9 @@ function deleteBook(id) {
     />
     <!-- グローバルローダー -->
     <Loader />
+    <v-snackbar v-model="snackbar" timeout="2000" color="green">
+      {{ snackbarMessage }}
+    </v-snackbar>
     <v-main>
       <v-container>
         <router-view v-slot="{ Component }">
