@@ -4,13 +4,44 @@
       <v-col cols="12">
         <v-card class="mx-auto">
           <v-row>
+            <!-- 左側：画像 -->
             <v-col cols="4">
               <v-img :src="book.image"></v-img>
             </v-col>
+            <!-- 右側：情報 -->
             <v-col cols="8">
               <v-card-title>
-                タイトル：{{ book.title }}
+
+                <div class="mt-2">
+                  タイトル：{{ book.title }}
+                  <v-text-field
+                    v-model="book.title"
+                    density="compact"
+                    style="max-width: 150px"
+                  />
+                </div>
               </v-card-title>
+                <div>id：{{ book.id }}　isbn：{{ book.isbn }}</div>
+                <div>シリーズ：{{ book.titleKana }}</div>
+                <div>出版社：{{ book.publisher }}</div>
+                <div>発売日：{{ book.publishedDate }}</div>
+
+                <div class="mt-2">
+                  最新巻：
+                  <v-text-field
+                    v-model="book.maxVolume"
+                    density="compact"
+                    style="max-width: 150px"
+                  />
+                </div>
+                <div class="mt-2">
+                  読んだ巻：
+                  <v-text-field
+                    v-model="book.readVolume"
+                    density="compact"
+                    style="max-width: 150px"
+                  />
+                </div>
               読んだ日：
               <v-menu
                 v-model="menu"
@@ -21,7 +52,7 @@
               >
                 <template #activator="{ props }">
                   <v-text-field
-                    v-model="date"
+                    v-model="book.readDate"
                     readonly
                     v-bind="props"
                   />
@@ -29,16 +60,28 @@
 
                 <v-date-picker
                   v-model="date"
-                  @update:model-value="menu = false"
+                  @update:model-value="onDateSelected"
                   locale="jp-ja"
                   :day-format="d => new Date(d).getDate()"
                 />
               </v-menu>
+              <div class="mt-2">
+                状態：
+                <v-select
+                  v-model="book.status"
+                  :items="statusList"
+                  item-title="label"
+                  item-value="code"
+                  density="compact"
+                  style="max-width: 200px"
+                />
+              </div>
+              <div class="mt-4">
               感想：<v-textarea
               class="mx-2" v-model="book.memo">
               {{book.memo }}
               </v-textarea>
-
+              </div>
               <v-card-actions>
                 <v-btn color="secondary" to="/">一覧に戻る</v-btn>
                 <v-btn color="info"
@@ -55,6 +98,9 @@
 <script>
 import { useRoute } from 'vue-router'
 import { ref } from 'vue'
+import { useDateFormatter } from '@/composables/useDateFormatter'
+import { useBookStatus } from '@/composables/useBookStatus'
+
 
 export default {
   name:'BookEdit',
@@ -64,30 +110,46 @@ export default {
   setup(props) {
     const route = useRoute()
     const id = Number(route.params.id)
+    const { statusList } = useBookStatus()
 
     const book = ref(props.books.find(b => b.id === id))
 
     const date = ref(book.value?.readDate ?? new Date().toISOString().substr(0, 10))
     const menu = ref(false)
-
-    const updateBookInfo = () => {
-      // emit は setup では使えないので Options API に移すか defineEmits を使う
-    }
-
+    const { formatDate } = useDateFormatter()
     return {
       book,
       date,
       menu,
+      formatDate,
+      statusList,
     }
   },
   methods:{
     updateBookInfo(){
+      let endVolume = 0
+      if(this.status == "完読"){
+        endVolume= this.maxVolume
+      }
+      console.log("this.date")
+      console.log(this.date)
       this.$emit('update-book-info',{
-        id: this.$route.params.id,
+        id: Number(this.$route.params.id),
+        title: this.book.title,
+        readVolume: this.book.readVolume,
         readDate: this.date,
-        memo: this.book.memo
+        endVolume: endVolume,
+        maxVolume: this.book.maxVolume,
+        memo: this.book.memo,
+        status: this.book.status,
       })
-    }
+    },
+
+    onDateSelected(value) {
+      this.menu = false
+      this.book.readDate = this.formatDate(value)
+      this.date = this.book.readDate
+    },
   },
 
 }

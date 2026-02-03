@@ -38,15 +38,19 @@ function addBook(e) {
 
   books.value.push({
     id: newId,
-    bid: e.bid,
+    isbn: e.isbn,
     title: e.title,
+    titleKana: e.titleKana,
+    author: e.author,
     publisher: e.publisher,
     publishedDate: e.publishedDate,
     image: e.image,
-    description: e.description,
     readDate: '',
+    readVolume: 0,
+    endVolume: 0,
+    maxVolume: 0,
     memo: '',
-    status:'',
+    status:'1',
   })
 
   saveBooks()
@@ -61,23 +65,36 @@ function removeBook(index) {
 }
 
 function saveBooks() {
+
   const parsed = JSON.stringify(books.value)
   localStorage.setItem(STORAGE_KEY, parsed)
 }
 
 function updateBookInfo(e) {
-  const updateInfo = {
-    id: books.value[e.id].id,
-    title: books.value[e.id].title,
-    publisher: books.value[e.id].publisher,
-    publishedDate: books.value[e.id].publishedDate,
-    memo: e.memo,
-    readDate: e.readDate,
-    image: books.value[e.id].image,
-    description: books.value[e.id].description
+  console.log(e)
+  const index = books.value.findIndex(b => b.id === e.id)
+  if (index === -1) {
+    console.error("Book not found:", e.id)
+    return
   }
 
-  books.value.splice(e.id, 1, updateInfo)
+  const updateInfo = {
+    id: Number(e.id),
+    isbn: books.value[index].isbn,
+    title: e.title,
+    titleKana: books.value[index].titleKana,
+    publisher: books.value[index].publisher,
+    publishedDate: books.value[index].publishedDate,
+    memo: e.memo,
+    readDate: e.readDate,
+    readVolume: e.readVolume,
+    endVolume: e.endVolume,
+    maxVolume: e.maxVolume,
+    image: books.value[index].image,
+    status: e.status,
+  }
+
+  books.value.splice(index, 1, updateInfo)
   saveBooks()
   router.push('/')
 }
@@ -119,6 +136,15 @@ function downloadConf() {
   URL.revokeObjectURL(url)
 
 }
+function deleteBook(id) {
+  const index = books.value.findIndex(b => b.id === id)
+  if (index !== -1) {
+    console.log(`削除: id=${id}, title=${books.value[index].title}`)
+    books.value.splice(index, 1)
+    saveBooks()
+  }
+}
+
 </script>
 
 <template>
@@ -130,7 +156,6 @@ function downloadConf() {
     <!-- グローバルローダー -->
     <Loader />
     <v-main>
-
       <v-container>
         <router-view v-slot="{ Component }">
           <component
@@ -138,12 +163,11 @@ function downloadConf() {
             :books="books"
             @add-book-list="addBook"
             @update-book-info="updateBookInfo"
+            @delete-book="deleteBook"
           />
         </router-view>
       </v-container>
     </v-main>
-
-
     <v-footer>
       <Footer/>
     </v-footer>
