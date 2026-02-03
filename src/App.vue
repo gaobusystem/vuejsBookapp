@@ -25,7 +25,21 @@ onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY)
   if (saved) {
     try {
-      books.value = JSON.parse(saved)
+      const loaded = JSON.parse(saved)
+
+      // ★ ソート処理を追加
+      loaded.sort((a, b) => {
+        // ① status 昇順
+        if (a.status !== b.status) {
+          return a.status - b.status
+        }
+
+        // ② publishedDate 降順
+        return new Date(b.publishedDate) - new Date(a.publishedDate)
+      })
+
+      books.value = loaded
+
     } catch (e) {
       localStorage.removeItem(STORAGE_KEY)
     }
