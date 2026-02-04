@@ -59,6 +59,7 @@ const items = ref([
   { title: '設定をダウンロード' },
   { title: '初期データインポート' },
   { title: '登録データをクリア' },
+  { title: 'デザインサンプル' },
 ])
 
 // emit
@@ -74,6 +75,9 @@ function onMenuClick(index) {
   }
   if (items.value[index].title === '初期データインポート') {
     router.push('/conf-download')
+  }
+  if (items.value[index].title === 'デザインサンプル') {
+    router.push('/designSample')
   }
 }
 </script>

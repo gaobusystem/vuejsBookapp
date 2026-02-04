@@ -26,6 +26,11 @@ const routes = [
     name: 'ConfDownload',
     component: () => import('@/pages/ConfDownload.vue')
   },
+  {
+    path: '/designSample',
+    name: 'DesignSample',
+    component: () => import('@/pages/DesignSample.vue')
+  },
   // Vue Router 4 では "*" は使えないので、正規表現に変更
   {
     path: '/:pathMatch(.*)*',
