@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useDateFormatter } from '@/composables/useDateFormatter'
 import { useBookStatus } from '@/composables/useBookStatus'
-
+import { useBookEvaluation } from '@/composables/useBookEvaluation'
 export default {
   props:{
     books:Array
@@ -10,7 +10,7 @@ export default {
   setup(props, { emit }) {
     const { formatDate } = useDateFormatter()
     const { getStatusLabel } = useBookStatus()
-
+    const { getEvaluationLabel } = useBookEvaluation()
     const deleteDialog = ref(false)
     const targetBook = ref(null)
 
@@ -28,7 +28,7 @@ export default {
       books: props.books,
       formatDate,
       getStatusLabel,
-      getStatusLabel,
+      getEvaluationLabel,
       deleteDialog,
       targetBook,
       confirmDelete,
@@ -61,7 +61,7 @@ export default {
               発売日：{{book.publishedDate}}<br>
               最新巻：{{book.maxVolume}}<br>
               読んだ巻：{{book.readVolume}}　<div>読んだ日：{{ formatDate(book.readDate, 'yyyy/MM/dd') }}</div>
-              状態：{{ getStatusLabel(book.status) }}
+              状態：{{ getStatusLabel(book.status) }}　評価：{{ getEvaluationLabel(book.evaluation) }}
               </v-card-text>
               <v-card-actions>
                 <v-btn :to="{name: 'BookEdit', params: {id: book.id}}"

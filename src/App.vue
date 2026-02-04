@@ -67,7 +67,8 @@ function addBook(e) {
     endVolume: 0,
     maxVolume: 0,
     memo: '',
-    status:'1',
+    status:1,
+    evaluation:1,
   })
 
   saveBooks()
@@ -109,6 +110,7 @@ function updateBookInfo(e) {
     maxVolume: e.maxVolume,
     image: books.value[index].image,
     status: e.status,
+    evaluation: e.evaluation,
   }
 
   books.value.splice(index, 1, updateInfo)

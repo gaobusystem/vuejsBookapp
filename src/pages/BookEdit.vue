@@ -76,6 +76,17 @@
                   style="max-width: 200px"
                 />
               </div>
+              <div class="mt-2">
+                評価：
+                <v-select
+                  v-model="book.evaluation"
+                  :items="evalList"
+                  item-title="label"
+                  item-value="code"
+                  density="compact"
+                  style="max-width: 200px"
+                />
+              </div>
               <div class="mt-4">
               感想：<v-textarea
               class="mx-2" v-model="book.memo">
@@ -100,7 +111,7 @@ import { useRoute } from 'vue-router'
 import { ref } from 'vue'
 import { useDateFormatter } from '@/composables/useDateFormatter'
 import { useBookStatus } from '@/composables/useBookStatus'
-
+import { useBookEvaluation } from '@/composables/useBookEvaluation'
 
 export default {
   name:'BookEdit',
@@ -111,7 +122,7 @@ export default {
     const route = useRoute()
     const id = Number(route.params.id)
     const { statusList } = useBookStatus()
-
+    const { evalList } = useBookEvaluation()
     const book = ref(props.books.find(b => b.id === id))
 
     const date = ref(book.value?.readDate ?? new Date().toISOString().substr(0, 10))
@@ -123,6 +134,7 @@ export default {
       menu,
       formatDate,
       statusList,
+      evalList,
     }
   },
   methods:{
@@ -142,6 +154,7 @@ export default {
         maxVolume: this.book.maxVolume,
         memo: this.book.memo,
         status: this.book.status,
+        evaluation: this.book.evaluation,
       })
     },
 
