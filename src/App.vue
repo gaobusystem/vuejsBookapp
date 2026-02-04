@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watch } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import Header from '@/global/Header.vue'
 import Footer from '@/global/Footer.vue'
@@ -44,6 +44,17 @@ onMounted(() => {
       localStorage.removeItem(STORAGE_KEY)
     }
   }
+})
+
+const sortedBooks = computed(() => {
+  if (!books.value) return []
+
+  return [...books.value].sort((a, b) => {
+    if (a.status !== b.status) {
+      return a.status - b.status
+    }
+    return new Date(b.publishedDate) - new Date(a.publishedDate)
+  })
 })
 
 // -------------------------
@@ -184,10 +195,11 @@ function deleteBook(id) {
     </v-snackbar>
     <v-main>
       <v-container>
-        <router-view v-slot="{ Component }">
+        <router-view v-slot="route">
           <component
-            :is="Component"
-            :books="books"
+            :is="route.Component"
+            v-bind="route.routeProps"
+            :books="sortedBooks"
             @add-book-list="addBook"
             @update-book-info="updateBookInfo"
             @delete-book="deleteBook"

@@ -7,35 +7,35 @@ export default {
   props:{
     books:Array
   },
-  setup(props, { emit }) {
-    const { formatDate } = useDateFormatter()
-    const { getStatusLabel } = useBookStatus()
-    const { getEvaluationLabel } = useBookEvaluation()
-    const deleteDialog = ref(false)
-    const targetBook = ref(null)
+ setup(props, { emit }) {
+  const { formatDate } = useDateFormatter()
+  const { getStatusLabel } = useBookStatus()
+  const { getEvaluationLabel } = useBookEvaluation()
 
-    const confirmDelete = (book) => {
-      targetBook.value = book
-      deleteDialog.value = true
-    }
+  const deleteDialog = ref(false)
+  const targetBook = ref(null)
 
-    const deleteBook = () => {
-      emit('delete-book', targetBook.value.id)
-      deleteDialog.value = false
-    }
-
-    return {
-      books: props.books,
-      formatDate,
-      getStatusLabel,
-      getEvaluationLabel,
-      deleteDialog,
-      targetBook,
-      confirmDelete,
-      deleteBook,
-
-    }
+  const confirmDelete = (book) => {
+    targetBook.value = book
+    deleteDialog.value = true
   }
+
+  const deleteBook = () => {
+    emit('delete-book', targetBook.value.id)
+    deleteDialog.value = false
+  }
+
+  return {
+    books: props.books,   // ← これが重要
+    formatDate,
+    getStatusLabel,
+    getEvaluationLabel,
+    deleteDialog,
+    targetBook,
+    confirmDelete,
+    deleteBook,
+  }
+}
 }
 </script>
 <template>
