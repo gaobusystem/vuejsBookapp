@@ -3,7 +3,7 @@ import BookIndex from '@/pages/BookIndex.vue'
 import BookSearch from '@/pages/BookSearch.vue'
 import BookEdit from '@/pages/BookEdit.vue'
 //import ConfDownload from '@/pages/ConfDownload.vue'
-
+import BookSearchNew from '@/pages/BookSearchNew.vue'
 const routes = [
   {
     path: '/',
@@ -14,6 +14,11 @@ const routes = [
     path: '/search',
     name: 'BookSearch',
     component: BookSearch
+  },
+  {
+    path: '/search/new',
+    name: 'BookSearchNew',
+    component: BookSearchNew
   },
   {
     path: '/edit/:id',

@@ -11,7 +11,7 @@
     <div class="flex-grow-1"></div>
 
     <!-- ハート -->
-    <v-btn icon>
+    <v-btn icon to="/search/new">
       <v-icon>mdi-heart</v-icon>
     </v-btn>
 
