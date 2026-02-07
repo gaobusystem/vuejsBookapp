@@ -98,7 +98,34 @@ function saveBooks() {
   const parsed = JSON.stringify(books.value)
   localStorage.setItem(STORAGE_KEY, parsed)
 }
+function updateBookNewInfo(e) {
+  console.log(e)
+  const index = books.value.findIndex(b => b.id === e.id)
+  if (index === -1) {
+    console.error("Book not found:", e.id)
+    return
+  }
 
+  const updateInfo = {
+    id: Number(e.id),
+    isbn: books.value[index].isbn,
+    title: books.value[index].title,
+    titleKana: books.value[index].titleKana,
+    publisher: books.value[index].publisher,
+    publishedDate: e.publishedDate,
+    memo: books.value[index].memo,
+    readDate: books.value[index].readDate,
+    readVolume: books.value[index].readVolume,
+    endVolume: books.value[index].endVolume,
+    maxVolume: e.maxVolume,
+    image: books.value[index].image,
+    status: books.value[index].status,
+    evaluation: books.value[index].evaluation,
+  }
+
+  books.value.splice(index, 1, updateInfo)
+  saveBooks()
+}
 function updateBookInfo(e) {
   console.log(e)
   const index = books.value.findIndex(b => b.id === e.id)
@@ -198,11 +225,12 @@ function deleteBook(id) {
         <router-view v-slot="route">
           <component
             :is="route.Component"
-            v-bind="route.routeProps"
             :books="sortedBooks"
+            v-bind="route.routeProps"
             @add-book-list="addBook"
             @update-book-info="updateBookInfo"
             @delete-book="deleteBook"
+            @update-book-new-info="updateBookNewInfo"
           />
         </router-view>
       </v-container>

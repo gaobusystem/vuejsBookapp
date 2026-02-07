@@ -1,14 +1,6 @@
 <template>
   <div>
-    <!-- 検索フォーム -->
-    <v-row>
-      <v-col cols="12">
-        <v-text-field
-          label="最新刊を検索"
-          v-model="keyword"
-        />
-      </v-col>
-    </v-row>
+    <h1 class="text-h4 font-weight-bold mb-4">最新刊を検索</h1>
 
     <!-- ボタン行 -->
     <v-row>
@@ -17,7 +9,7 @@
           color="primary"
           @click="search"
         >
-          検索する
+          再検索
         </v-btn>
       </v-col>
 
@@ -82,7 +74,7 @@
 
 
 <script setup>
-import { ref,  nextTick } from 'vue'
+import { ref, onMounted, nextTick  } from 'vue'
 import { useLoaderStore } from '@/stores/loader'
 const loader = useLoaderStore()
 
@@ -93,16 +85,39 @@ const props = defineProps({
   }
 })
 
+onMounted(async () => {
+  await nextTick()
+  search()
+})
+function updateBookInfo() {
+  let endVolume = 0
+  if(this.status == "完読"){
+    endVolume= this.maxVolume
+  }
+  console.log("this.date")
+  console.log(this.date)
+  this.$emit('update-book-info',{
+    id: Number(this.$route.params.id),
+    title: this.book.title,
+    readVolume: this.book.readVolume,
+    readDate: this.date,
+    endVolume: endVolume,
+    maxVolume: this.book.maxVolume,
+    memo: this.book.memo,
+    status: this.book.status,
+    evaluation: this.book.evaluation,
+  })
+}
+
 // -------------------------
 // state
 // -------------------------
-const keyword = ref('')
 const searchResults = ref([])
 
 // -------------------------
 // emit
 // -------------------------
-const emit = defineEmits(['add-book-list'])
+const emit = defineEmits(['add-book-list'], 'update-book-new-info')
 
 // -------------------------
 // methods
@@ -139,6 +154,7 @@ async function search() {
 
   searchResults.value = []
   if (props.books.length <= 0 ){
+    console.log("props.books.length <= 0")
     return ""
   }
 
@@ -150,14 +166,14 @@ async function search() {
   const params = {
     applicationId:"1081189654826734250",
     title: `${book.title}`,
-    hits: 3,
+    hits: 5,
     page: 1,
     sort:"-releaseDate",
     formatVersion: 2
   }
   await new Promise(resolve => setTimeout(resolve, 500))
   const queryParams = new URLSearchParams(params)
-  console.log(book.title)
+
 
   // fetch
   const response = await fetch(baseUrl + queryParams)
@@ -165,30 +181,50 @@ async function search() {
 
   console.log(response.Items)
   // push results
-  for (let book of response.Items) {
-    const publishedDate = book.salesDate
-      console.log(publishedDate)
+  for (let bookSr of response.Items) {
+    const publishedDate = bookSr.salesDate
+    console.log(publishedDate)
     const parsedDate = parseSalesDate(publishedDate)
-  console.log(parsedDate)
+    console.log("parsedDate")
+    console.log(parsedDate)
+    console.log("book.publishedDate")
+    console.log(book.publishedDate)
     // 過去1年以内だけ追加
     if (isWithinSixMonths(parsedDate)) {
         console.log("target")
-      const isbn = book.isbn
-      const title = book.title
-      const titleKana = book.titleKana
-      const author = book.author
-      const publisher = book.publisherName
-      const img = book.mediumImageUrl
+      if (parsedDate > parseSalesDate(book.publishedDate)){
+          console.log("最新")
+        const isbn = bookSr.isbn
+        const title = bookSr.title
+        const titleKana = bookSr.titleKana
+        const author = bookSr.author
+        const publisher = bookSr.publisherName
+        const img = bookSr.mediumImageUrl
 
-      searchResults.value.push({
-        isbn: isbn,
-        title: title || '',
-        titleKana: titleKana || '',
-        author: author || '',
-        publisher: publisher || '',
-        publishedDate: publishedDate || '',
-        image: img  || '',
-      })
+        searchResults.value.push({
+          isbn: isbn,
+          title: title || '',
+          titleKana: titleKana || '',
+          author: author || '',
+          publisher: publisher || '',
+          publishedDate: publishedDate || '',
+          image: img  || '',
+        })
+        let newVol = title
+          .replace(book.title, "")
+          .replace("（", "")
+          .replace("）", "")
+          .replace(" ", "")
+        console.log("newVol")
+        console.log(newVol)
+        if (!isNaN(newVol)){
+          emit('update-book-new-info',{
+            id: book.id,
+            publishedDate: publishedDate,
+            maxVolume: newVol,
+          })
+        }
+      }
     }
   }
 
