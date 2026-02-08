@@ -4,9 +4,11 @@ import { useRouter } from 'vue-router'
 import Header from '@/global/Header.vue'
 import Footer from '@/global/Footer.vue'
 import Loader from '@/components/Loader.vue'
+import { useDateFormatter } from '@/composables/useDateFormatter'
 
 const STORAGE_KEY = 'books'
 const router = useRouter()
+const { toISO } = useDateFormatter()
 
 // -------------------------
 // state
@@ -15,17 +17,9 @@ const books = ref([])
 const snackbar = ref(false)
 const snackbarMessage = ref('')
 
-
 // -------------------------
 // lifecycle
 // -------------------------
-const toISO = (str) => {
-  if (!str) return '1970-01-01'
-  return str.replace('頃', '')
-            .replace('年', '-')
-            .replace('月', '-')
-            .replace('日', '')
-}
 
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY)

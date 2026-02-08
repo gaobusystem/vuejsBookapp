@@ -25,7 +25,7 @@ export function useDateFormatter() {
   const isFutureDate = (dateString) => {
     if (!dateString) return false
 
-    const date = new Date(parseDate(dateString))
+    const date = new Date(toISO(dateString))
     if (isNaN(date.getTime())) return false  // ← ここも必要
 
     const today = new Date()
@@ -33,18 +33,14 @@ export function useDateFormatter() {
 
     return date > today
   }
+  const toISO = (str) => {
+    if (!str) return '1970-01-01'
+    return str.replace('頃', '')
+              .replace('年', '-')
+              .replace('月', '-')
+              .replace('日', '')
+  }
 
-  function parseDate(dateStr) {
-    if (!dateStr) return null
-
-    const cleaned = dateStr
-      .replace("頃", "")
-      .replace("年", "-")
-      .replace("月", "-")
-      .replace("日", "")
-      
-  return cleaned
-}
   /**
    * 今日の日付を指定フォーマットで返す
    */
@@ -56,6 +52,7 @@ export function useDateFormatter() {
     formatDate,
     today,
     isFutureDate,
+    toISO
   }
 }
 

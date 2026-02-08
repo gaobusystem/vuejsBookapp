@@ -76,7 +76,10 @@
 <script setup>
 import { ref, onMounted, nextTick  } from 'vue'
 import { useLoaderStore } from '@/stores/loader'
+import { useDateFormatter } from '@/composables/useDateFormatter'
+
 const loader = useLoaderStore()
+const { toISO } = useDateFormatter()
 
 const props = defineProps({
   books: {
@@ -127,14 +130,9 @@ function addBookList(index) {
 }
 
 function parseSalesDate(dateStr) {
-  if (!dateStr) return null
 
   // "2021年04月30日頃" → "2021-04-30"
-  const cleaned = dateStr
-    .replace("頃", "")
-    .replace("年", "-")
-    .replace("月", "-")
-    .replace("日", "")
+  const cleaned = toISO(dateStr)
 
   const d = new Date(cleaned)
   return isNaN(d.getTime()) ? null : d
