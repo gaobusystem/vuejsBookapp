@@ -12,7 +12,6 @@ const router = useRouter()
 // state
 // -------------------------
 const books = ref([])
-const newBook = ref(null)
 const snackbar = ref(false)
 const snackbarMessage = ref('')
 
@@ -20,6 +19,13 @@ const snackbarMessage = ref('')
 // -------------------------
 // lifecycle
 // -------------------------
+const toISO = (str) => {
+  if (!str) return '1970-01-01'
+  return str.replace('頃', '')
+            .replace('年', '-')
+            .replace('月', '-')
+            .replace('日', '')
+}
 
 onMounted(() => {
   const saved = localStorage.getItem(STORAGE_KEY)
@@ -30,12 +36,12 @@ onMounted(() => {
       // ★ ソート処理を追加
       loaded.sort((a, b) => {
         // ① status 昇順
-        if (a.status !== b.status) {
-          return a.status - b.status
+        if (a.evaluation !== b.evaluation) {
+          return b.evaluation - a.evaluation
         }
 
         // ② publishedDate 降順
-        return new Date(b.publishedDate) - new Date(a.publishedDate)
+        return new Date(toISO(b.publishedDate)) - new Date(toISO(a.publishedDate))
       })
 
       books.value = loaded
@@ -50,10 +56,10 @@ const sortedBooks = computed(() => {
   if (!books.value) return []
 
   return [...books.value].sort((a, b) => {
-    if (a.status !== b.status) {
-      return a.status - b.status
+    if (a.evaluation !== b.evaluation) {
+      return b.evaluation - a.evaluation
     }
-    return new Date(b.publishedDate) - new Date(a.publishedDate)
+    return new Date(toISO(b.publishedDate)) - new Date(toISO(a.publishedDate))
   })
 })
 

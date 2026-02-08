@@ -72,7 +72,7 @@ export default {
                                             </v-chip>
               <br>
               最新巻：{{book.maxVolume}}<br>
-              読んだ巻：{{book.readVolume}}　読んだ日：{{ formatDate(book.readDate, 'yyyy/MM/dd') }}
+              読んだ巻：{{book.readVolume}}　読んだ日：{{ formatDate(book.readDate, 'yyyy/MM/dd') }}<br>
               状態：{{ getStatusLabel(book.status) }}　評価：{{ getEvaluationLabel(book.evaluation) }}
               </v-card-text>
               <v-card-actions>
