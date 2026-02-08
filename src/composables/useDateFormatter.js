@@ -8,7 +8,7 @@ export function useDateFormatter() {
     if (!input) return ''
 
     const date = new Date(input)
-    if (isNaN(date)) return ''
+    if (isNaN(date.getTime())) return ''
 
     const map = {
       yyyy: date.getFullYear(),
@@ -22,6 +22,29 @@ export function useDateFormatter() {
     return format.replace(/yyyy|MM|dd|HH|mm|ss/g, m => map[m])
   }
 
+  const isFutureDate = (dateString) => {
+    if (!dateString) return false
+
+    const date = new Date(parseDate(dateString))
+    if (isNaN(date.getTime())) return false  // ← ここも必要
+
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+
+    return date > today
+  }
+
+  function parseDate(dateStr) {
+    if (!dateStr) return null
+
+    const cleaned = dateStr
+      .replace("頃", "")
+      .replace("年", "-")
+      .replace("月", "-")
+      .replace("日", "")
+      
+  return cleaned
+}
   /**
    * 今日の日付を指定フォーマットで返す
    */
@@ -32,6 +55,7 @@ export function useDateFormatter() {
   return {
     formatDate,
     today,
+    isFutureDate,
   }
 }
 

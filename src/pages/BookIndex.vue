@@ -3,12 +3,13 @@ import { ref } from 'vue'
 import { useDateFormatter } from '@/composables/useDateFormatter'
 import { useBookStatus } from '@/composables/useBookStatus'
 import { useBookEvaluation } from '@/composables/useBookEvaluation'
+
 export default {
   props:{
     books:Array
   },
  setup(props, { emit }) {
-  const { formatDate } = useDateFormatter()
+  const { formatDate, isFutureDate } = useDateFormatter()
   const { getStatusLabel } = useBookStatus()
   const { getEvaluationLabel } = useBookEvaluation()
 
@@ -25,9 +26,12 @@ export default {
     deleteDialog.value = false
   }
 
+
+
   return {
     books: props.books,   // ← これが重要
     formatDate,
+    isFutureDate,
     getStatusLabel,
     getEvaluationLabel,
     deleteDialog,
@@ -58,9 +62,17 @@ export default {
               id：{{book.id}}　isbn：{{book.isbn}}<br>
               シリーズ：{{book.titleKana}}<br>
               出版社：{{book.publisher}}<br>
-              発売日：{{book.publishedDate}}<br>
+              発売日：{{book.publishedDate}} <v-chip   v-if="isFutureDate(book.publishedDate)"
+                                              color="red"
+                                              text-color="white"
+                                              size="small"
+                                              class="ml-2"
+                                            >
+                                              発売予定
+                                            </v-chip>
+              <br>
               最新巻：{{book.maxVolume}}<br>
-              読んだ巻：{{book.readVolume}}　<div>読んだ日：{{ formatDate(book.readDate, 'yyyy/MM/dd') }}</div>
+              読んだ巻：{{book.readVolume}}　読んだ日：{{ formatDate(book.readDate, 'yyyy/MM/dd') }}
               状態：{{ getStatusLabel(book.status) }}　評価：{{ getEvaluationLabel(book.evaluation) }}
               </v-card-text>
               <v-card-actions>
