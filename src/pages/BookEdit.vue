@@ -38,26 +38,30 @@
             <div>出版社：{{ book.publisher }}</div>
             <div>発売日：{{ book.publishedDate }}</div>
 
-                <div class="mt-2">
-                  <v-text-field
-                    v-model.number="book.maxVolume"
-                    type="number"
-                    label="最新巻"
-                    :error-messages="v$.maxVolume.$errors.map(e => e.$message)"
-                    density="compact"
-                    style="max-width: 150px"
-                  />
-                </div>
-                <div class="mt-2">
-                  <v-text-field
-                    v-model.number="book.readVolume"
-                    type="number"
-                    label="読んだ巻"
-                    :error-messages="v$.readVolume.$errors.map(e => e.$message)"
-                    density="compact"
-                    style="max-width: 150px"
-                  />
-                </div>
+            <v-row class="mt-2" align="center">
+              <v-col cols="6">
+                <v-text-field
+                  v-model.number="book.maxVolume"
+                  type="number"
+                  label="最新巻"
+                  :error-messages="v$.maxVolume.$errors.map(e => e.$message)"
+                  density="compact"
+                  style="max-width: 150px"
+                />
+              </v-col>
+
+              <v-col cols="6">
+                <v-text-field
+                  v-model.number="book.readVolume"
+                  type="number"
+                  label="読んだ巻"
+                  :error-messages="v$.readVolume.$errors.map(e => e.$message)"
+                  density="compact"
+                  style="max-width: 150px"
+                />
+              </v-col>
+            </v-row>
+
               読んだ日：
               <v-menu
                 v-model="menu"
