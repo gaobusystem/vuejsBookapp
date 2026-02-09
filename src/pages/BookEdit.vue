@@ -10,21 +10,33 @@
             </v-col>
             <!-- 右側：情報 -->
             <v-col cols="8">
-              <v-card-title>
+              <div class="">
+                  <v-card-title>
+                    タイトル：
+                  <!-- 表示モード -->
+                  <span v-if="!isEditingTitle" @click="isEditingTitle = true" style="cursor: pointer;">
+                    {{ book.title }}
+                    <v-icon size="16" class="ml-1">mdi-pencil</v-icon>
+                  </span>
 
-                <div class="mt-2">
-                  タイトル：{{ book.title }}
-                  <v-text-field
-                    v-model="book.title"
-                    density="compact"
-                    style="max-width: 150px"
-                  />
-                </div>
+                  <!-- 編集モード -->
+                  <div v-else>
+                    <v-text-field
+                      v-model="book.title"
+                      density="compact"
+                      style="max-width: 250px"
+                      @keyup.enter="isEditingTitle = false"
+                    />
+                    <v-btn size="small" color="primary" @click="isEditingTitle = false">OK</v-btn>
+                    <v-btn size="small" @click="isEditingTitle = false">キャンセル</v-btn>
+                  </div>
               </v-card-title>
-                <div>id：{{ book.id }}　isbn：{{ book.isbn }}</div>
-                <div>シリーズ：{{ book.titleKana }}</div>
-                <div>出版社：{{ book.publisher }}</div>
-                <div>発売日：{{ book.publishedDate }}</div>
+            </div>
+
+            <div>id：{{ book.id }}　isbn：{{ book.isbn }}</div>
+            <div>シリーズ：{{ book.titleKana }}</div>
+            <div>出版社：{{ book.publisher }}</div>
+            <div>発売日：{{ book.publishedDate }}</div>
 
                 <div class="mt-2">
                   <v-text-field
@@ -129,6 +141,7 @@ export default {
     const { statusList } = useBookStatus()
     const { evalList } = useBookEvaluation()
     const original = props.books.find(b => b.id === id)
+    const isEditingTitle = ref(false)
 
     const book = reactive({
       ...original
@@ -138,20 +151,20 @@ export default {
     const menu = ref(false)
     const { formatDate } = useDateFormatter()
     // --- Vuelidate rules ---
-const rules = computed(() => ({
-  maxVolume: {
-    required: helpers.withMessage('最新巻は必須です', required),
-    minValue: helpers.withMessage('1以上の数値を入力してください', minValue(1)),
-  },
-  readVolume: {
-    required: helpers.withMessage('読んだ巻は必須です', required),
-    minValue: helpers.withMessage('1以上の数値を入力してください', minValue(0)),
-    maxValue: helpers.withMessage(
-      () => `読んだ巻は最新巻（${book.maxVolume}）以下で入力してください`,
-      maxValue(Number(book.maxVolume))
-    ),
-  },
-}))
+    const rules = computed(() => ({
+      maxVolume: {
+        required: helpers.withMessage('最新巻は必須です', required),
+        minValue: helpers.withMessage('1以上の数値を入力してください', minValue(1)),
+      },
+      readVolume: {
+        required: helpers.withMessage('読んだ巻は必須です', required),
+        minValue: helpers.withMessage('1以上の数値を入力してください', minValue(0)),
+        maxValue: helpers.withMessage(
+          () => `読んだ巻は最新巻（${book.maxVolume}）以下で入力してください`,
+          maxValue(Number(book.maxVolume))
+        ),
+      },
+    }))
 
 
     const v$ = useVuelidate(computed(() => rules), book)
@@ -164,6 +177,7 @@ const rules = computed(() => ({
       statusList,
       evalList,
       v$,
+      isEditingTitle,
     }
   },
   methods:{
