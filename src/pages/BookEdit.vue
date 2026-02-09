@@ -27,17 +27,21 @@
                 <div>発売日：{{ book.publishedDate }}</div>
 
                 <div class="mt-2">
-                  最新巻：
                   <v-text-field
-                    v-model="book.maxVolume"
+                    v-model.number="book.maxVolume"
+                    type="number"
+                    label="最新巻"
+                    :error-messages="v$.maxVolume.$errors.map(e => e.$message)"
                     density="compact"
                     style="max-width: 150px"
                   />
                 </div>
                 <div class="mt-2">
-                  読んだ巻：
                   <v-text-field
-                    v-model="book.readVolume"
+                    v-model.number="book.readVolume"
+                    type="number"
+                    label="読んだ巻"
+                    :error-messages="v$.readVolume.$errors.map(e => e.$message)"
                     density="compact"
                     style="max-width: 150px"
                   />
@@ -105,10 +109,11 @@
     </v-row>
   </div>
 </template>
-
 <script>
 import { useRoute } from 'vue-router'
-import { ref } from 'vue'
+import { ref, reactive, computed } from 'vue'
+import useVuelidate from '@vuelidate/core'
+import { required, numeric, minValue, maxValue, helpers } from '@vuelidate/validators'
 import { useDateFormatter } from '@/composables/useDateFormatter'
 import { useBookStatus } from '@/composables/useBookStatus'
 import { useBookEvaluation } from '@/composables/useBookEvaluation'
@@ -123,11 +128,34 @@ export default {
     const id = Number(route.params.id)
     const { statusList } = useBookStatus()
     const { evalList } = useBookEvaluation()
-    const book = ref(props.books.find(b => b.id === id))
+    const original = props.books.find(b => b.id === id)
 
-    const date = ref(book.value?.readDate ?? new Date().toISOString().substr(0, 10))
+    const book = reactive({
+      ...original
+    })
+
+    const date = ref(book.readDate ?? new Date().toISOString().substr(0, 10))
     const menu = ref(false)
     const { formatDate } = useDateFormatter()
+    // --- Vuelidate rules ---
+const rules = computed(() => ({
+  maxVolume: {
+    required: helpers.withMessage('最新巻は必須です', required),
+    minValue: helpers.withMessage('1以上の数値を入力してください', minValue(1)),
+  },
+  readVolume: {
+    required: helpers.withMessage('読んだ巻は必須です', required),
+    minValue: helpers.withMessage('1以上の数値を入力してください', minValue(0)),
+    maxValue: helpers.withMessage(
+      () => `読んだ巻は最新巻（${book.maxVolume}）以下で入力してください`,
+      maxValue(Number(book.maxVolume))
+    ),
+  },
+}))
+
+
+    const v$ = useVuelidate(computed(() => rules), book)
+
     return {
       book,
       date,
@@ -135,16 +163,21 @@ export default {
       formatDate,
       statusList,
       evalList,
+      v$,
     }
   },
   methods:{
-    updateBookInfo(){
-      let endVolume = 0
-      if(this.status == "完読"){
-        endVolume= this.maxVolume
+    async updateBookInfo() {
+      const isValid = await this.v$.$validate()
+      if (!isValid) {
+        console.log("入力に誤りがあります")
+        return
       }
-      console.log("this.date")
-      console.log(this.date)
+      let endVolume = 0
+      if(this.book.status == "完読"){
+        endVolume= this.book.maxVolume
+      }
+
       this.$emit('update-book-info',{
         id: Number(this.$route.params.id),
         title: this.book.title,
