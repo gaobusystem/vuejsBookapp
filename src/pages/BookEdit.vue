@@ -11,12 +11,16 @@
             <!-- 右側：情報 -->
             <v-col cols="8">
               <div class="">
-                  <v-card-title>
+                <v-card-title>
                     タイトル：
                   <!-- 表示モード -->
                   <span v-if="!isEditingTitle" @click="isEditingTitle = true" style="cursor: pointer;">
                     {{ book.title }}
                     <v-icon size="16" class="ml-1">mdi-pencil</v-icon>
+                    <!-- ★ここにエラー表示を追加 -->
+                      <div v-if="v$.title.$error" style="color: red; font-size: 12px;">
+                        {{ v$.title.$errors[0].$message }}
+                      </div>
                   </span>
 
                   <!-- 編集モード -->
@@ -24,14 +28,15 @@
                     <v-text-field
                       v-model="book.title"
                       density="compact"
+                      :error-messages="v$.title.$errors.map(e => e.$message)"
                       style="max-width: 250px"
                       @keyup.enter="isEditingTitle = false"
                     />
                     <v-btn size="small" color="primary" @click="isEditingTitle = false">OK</v-btn>
                     <v-btn size="small" @click="isEditingTitle = false">キャンセル</v-btn>
                   </div>
-              </v-card-title>
-            </div>
+                </v-card-title>
+              </div>
 
             <div>id：{{ book.id }}　isbn：{{ book.isbn }}</div>
             <div>シリーズ：{{ book.titleKana }}</div>
@@ -157,6 +162,9 @@ export default {
     const { formatDate } = useDateFormatter()
     // --- Vuelidate rules ---
     const rules = computed(() => ({
+      title: {
+        required: helpers.withMessage(requiredMessage("タイトル"), required),
+      },
       maxVolume: {
         required: helpers.withMessage(requiredMessage("最新巻"), required),
         minValue: helpers.withMessage(minValMessage('最新巻',1), minValue(1)),
