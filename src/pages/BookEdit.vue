@@ -133,7 +133,8 @@ import { required, numeric, minValue, maxValue, helpers } from '@vuelidate/valid
 import { useDateFormatter } from '@/composables/useDateFormatter'
 import { useBookStatus } from '@/composables/useBookStatus'
 import { useBookEvaluation } from '@/composables/useBookEvaluation'
-
+ // バリデーションメッセージ
+import { requiredMessage, minValMessage } from '@/plugins/validatorMessage.js';
 export default {
   name:'BookEdit',
   props:{
@@ -157,12 +158,12 @@ export default {
     // --- Vuelidate rules ---
     const rules = computed(() => ({
       maxVolume: {
-        required: helpers.withMessage('最新巻は必須です', required),
-        minValue: helpers.withMessage('1以上の数値を入力してください', minValue(1)),
+        required: helpers.withMessage(requiredMessage("最新巻"), required),
+        minValue: helpers.withMessage(minValMessage('最新巻',1), minValue(1)),
       },
       readVolume: {
         required: helpers.withMessage('読んだ巻は必須です', required),
-        minValue: helpers.withMessage('1以上の数値を入力してください', minValue(0)),
+        minValue: helpers.withMessage(minValMessage('読んだ巻',0), minValue(0)),
         maxValue: helpers.withMessage(
           () => `読んだ巻は最新巻（${book.maxVolume}）以下で入力してください`,
           maxValue(Number(book.maxVolume))
