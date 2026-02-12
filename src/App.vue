@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router'
 import Header from '@/global/Header.vue'
 import Footer from '@/global/Footer.vue'
 import Loader from '@/components/Loader.vue'
+import GlobalNotification from '@/components/GlobalNotification.vue'
 import { useDateFormatter } from '@/composables/useDateFormatter'
 
 const STORAGE_KEY = 'books'
@@ -211,12 +212,15 @@ function deleteBook(id) {
 
 <template>
   <v-app>
+    <!-- グローバル通知（アプリ全体で1回だけ配置） -->
+    <GlobalNotification />
     <Header
     @delete-local-storage="deleteLocalStorage"
     @download-conf="downloadConf"
     />
     <!-- グローバルローダー -->
     <Loader />
+
     <v-snackbar v-model="snackbar" timeout="2000" color="green">
       {{ snackbarMessage }}
     </v-snackbar>
