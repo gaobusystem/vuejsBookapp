@@ -79,21 +79,22 @@
   </div>
 </template>
 
-
-
 <script setup>
-import { ref,  nextTick } from 'vue'
 import { useLoaderStore } from '@/stores/loader'
+import { useNotificationStore } from '@/stores/notification'
+
+import axios from 'axios'
+import { ref } from 'vue'
+
 const loader = useLoaderStore()
-
-
-
+const notificationStore = useNotificationStore()
 // -------------------------
 // state
 // -------------------------
 const keyword = ref('')
 const searchResults = ref([])
-
+const items = ref([])
+const error = ref(null)
 // -------------------------
 // emit
 // -------------------------
@@ -123,21 +124,138 @@ async function search() {
     sort:"-releaseDate",
     formatVersion: 2
   }
-  await new Promise(resolve => setTimeout(resolve, 3000))
 
   loader.hide()
-
   const queryParams = new URLSearchParams(params)
   console.log("url: " + baseUrl + queryParams)
+  let res = null;
+  try{
+    // リクエスト インターセプターを追加します
+    axios.interceptors.request.use(config=> {
+        // リクエストが送信される前の処理
+        const authToken = localStorage.getItem('authToken');
+        if(authToken){
+          config.headers.Authorization = `Bearer ${authToken}`;
+        }
+        console.log("Request Interceptor:Sending request to", config.url)
+        return config;
+    }, error=> {
+        // リクエスト エラーの処理
+        console.error("Request Interceptor Error", error)
+        return Promise.reject(error);
+      },
+    );
 
-  // fetch
-  const response = await fetch(baseUrl + queryParams)
-    .then(res => res.json())
+    // レスポンス インターセプターを追加します
+    axios.interceptors.response.use(function onFulfilled(response) {
+        // ステータスコードが 2xx の範囲にある場合、この関数が起動します
+        // レスポンス データの処理
+        return response;
+      }, function onRejected(error) {
+        // ステータスコードが 2xx の範囲外の場合、この関数が起動します
+        // レスポンス エラーの処理
+        return Promise.reject(error);
+      });
 
-  console.log(response.Items)
+    axios.interceptors.response.use(
+      response => {
+        // 2xx 成功時の共通処理
+        console.log("Response Interceptor: Received response from", response.config.url, 'Status:', response.status)
+        return response;
+      },
+      error => {
+        // 4xx 5xx
+        console.error("Response Interceptor Error: ", error.response ? error.response.status : error.message)
+        const status = error.response ? error.response.status : null;
 
-  // push results
-  for (let book of response.Items) {
+        switch (status) {
+          case 400:
+            console.warn('Bad Request');
+            break;
+
+          case 401:
+            console.warn('Unauthorized');
+            //認証トークンを削除する処理
+            // const authStore = useAuthStore();
+            // authStore.logout();
+            localStorage.removeItem('authToken');
+            // 例: ログインページへリダイレクト
+            // window.location.href = '/login';
+            // router.push('/login')
+            // return Promise.reject(error);
+            break;
+
+          case 403:
+            console.warn('Forbidden');
+            break;
+
+          case 404:
+            console.warn('Not Found');
+            break;
+
+          case 419:
+            console.warn('CSRF Token Expired');
+            // 例: ページリロード
+            // window.location.reload();
+            break;
+
+          case 422:
+            console.warn('Validation Error');
+            break;
+
+          case 500:
+            console.error('Server Error');
+            break;
+
+          default:
+            console.error('Unknown Error');
+        }
+
+        // 個別の catch にも流す
+        return Promise.reject(error);
+      }
+    );
+    const response = await axios.get(baseUrl + queryParams)
+    res = response.data;
+    if(response.status === 200){
+      console.log("データ取得成功(200 OK)", response.data)
+    }else if(response.status === 204){
+      console.log("データ取得成功 コンテンツなし(204 No Content)")
+    }
+  }catch(err){
+    console.error('Failed to fetch items: ', err)
+    if(axios.isAxiosError(error)&& error.response){
+      const statusCode = error.response.status;
+      const errorData = error.response.data;// バックエンドからのエラー詳細
+      if(statusCode === 404){
+        console.warn('リソースが見つかりません(404 Not Found)')
+        alert('探しているデータは見つかりませんでした')
+      }else if(statusCode === 403){
+        console.warn('アクセス権限がありません(403 Forbidden)')
+        alert('この操作を行う権限がありません')
+      }else if(statusCode === 422){
+        console.warn('入力値バリデーションエラー(422 Unprocessable)')
+        alert('入力値バリデーションエラー', errorData.detail)
+      }else if(statusCode >= 500){
+        console.warn('サーバーエラーが発生しました', statusCode, errorData)
+        alert('現在サービスに問題が発生しています。お時間をおいてサイドお試しください')
+      }else{
+        //その他の4xx　エラーなど
+        console.warn('Client error: ', statusCode, errorData)
+        alert('リクエストに失敗しました')
+      }
+    }else{
+      //ネットワークエラーなど、レスポンスがない場合
+      console.warn('Network or other error', error)
+      alert('ネットワークエラーが発生しました')
+    }
+  }finally{
+    loader.hide()
+    notificationStore.showNotification('検索しました', 'info')
+  }
+
+
+  for (let book of res.Items) {
     const isbn = book.isbn
     const title = book.title
     const titleKana = book.titleKana
@@ -158,6 +276,7 @@ async function search() {
   //    description: description ? description.slice(0, 40) : ''
     })
   }
+
   console.log("searchResults.value")
   console.log(searchResults.value)
 }
