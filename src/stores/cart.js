@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia';
-import  axios  from 'axios'
 
 export const useCartStore = defineStore('cart',  {
     state:() =>({
@@ -30,6 +29,12 @@ export const useCartStore = defineStore('cart',  {
                     this.removeItem(itemId); //0以下なら削除
                 }
             }
+        },
+        async saveCart(){
+
+        },
+        async loadCart(){
+
         },
     },
 });
