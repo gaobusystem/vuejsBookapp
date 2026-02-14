@@ -74,9 +74,9 @@
 
 
 <script setup>
-import { ref, onMounted, nextTick  } from 'vue'
-import { useLoaderStore } from '@/stores/loader'
 import { useDateFormatter } from '@/composables/useDateFormatter'
+import { useLoaderStore } from '@/stores/loader'
+import { nextTick, onMounted, ref } from 'vue'
 
 const loader = useLoaderStore()
 const { toISO } = useDateFormatter()

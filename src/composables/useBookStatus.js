@@ -7,6 +7,7 @@ export function useBookStatus() {
     { code: 6, label: '未読' },
     { code: 8, label: '未発売' },
     { code: 90, label: '完読' },
+    { code: 95, label: 'つまらん' },
   ]
 
   const getStatusLabel = (code) => {

@@ -26,6 +26,7 @@ const routes = [
     component: BookEdit,
     props: true
   },
+  // コンポーネントの遅延ロード
   {
     path: '/conf-download',
     name: 'ConfDownload',
@@ -42,9 +43,11 @@ const routes = [
     redirect: '/'
   }
 ]
-
+// ルーターインスタンスの作成
 const router = createRouter({
+  // 履歴モードを選択
   history: createWebHistory(),
+  // 定義したルートを渡す
   routes,
   scrollBehavior(to, from, savedPosition) {
   console.log(to, from, savedPosition)

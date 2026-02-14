@@ -60,8 +60,7 @@ export default {
               <v-card-title class="no-ellipsis">{{ book.title }}</v-card-title>
               <v-card-text>
               id：{{book.id}}　isbn：{{book.isbn}}<br>
-              シリーズ：{{book.titleKana}}<br>
-              出版社：{{book.publisher}}<br>
+               出版社：{{book.publisher}}<br>
               発売日：{{book.publishedDate}} <v-chip   v-if="isFutureDate(book.publishedDate)"
                                               color="red"
                                               text-color="white"
