@@ -37,16 +37,35 @@ const routes = [
     name: 'DesignSample',
     component: () => import('@/pages/DesignSample.vue')
   },
+    {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/pages/login.vue'),
+    meta:{ requiresGust: true} // 未承認ユーザーのみアクセス可能
+  },
+  {
+    path: '/mypage',
+    name: 'mypage',
+    component: () => import('@/pages/MyPage.vue'),
+    meta:{ requiresAuth: true} // 承認ユーザーのみアクセス可能
+  },
+  {
+    path: '/admin',
+    name: 'admin',
+    component: () => import('@/pages/AdminDashboard.vue'),
+    meta:{ requiresAuth: true, requireRole:'admin'} // 承認ユーザーのみアクセス可能
+  },
   // Vue Router 4 では "*" は使えないので、正規表現に変更
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/'
+    redirect: 'NotFound',
+    component: () => import('@/pages/NotFound.vue')
   }
 ]
 // ルーターインスタンスの作成
 const router = createRouter({
   // 履歴モードを選択
-  history: createWebHistory(),
+  history: createWebHistory(import.meta.env,'/'),
   // 定義したルートを渡す
   routes,
   scrollBehavior(to, from, savedPosition) {

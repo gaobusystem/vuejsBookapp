@@ -1,0 +1,41 @@
+export const counterMixin = {
+    data(){
+        return {
+            count: 0
+        }
+    },
+    computed:{
+        doubleCount(){
+            return count.value * 2;
+        }
+    },
+    methods:{
+        increment(){
+            count.value++;
+        },
+        decrement(){
+            count.value--;
+        }
+    },
+    mounted(){
+            console.log('Mixin mounted!')
+    }
+}
+
+// 使い方
+// <script>
+//import { counterMixin } from '@/mixins/counterMixin';
+//export default {
+//    mixins: [counterMixin],
+//    data(){
+//        return {
+//            localData: 'Some data'
+//        }
+//    },
+//    mounted(){
+//       console.log('Mixin mounted!');
+//       console.log('Count from mixin:', this.count);
+//       this.increment();
+//    }
+//}
+//</script>

@@ -1,5 +1,6 @@
 import { defineStore } from 'pinia';
 import  axios  from 'axios'
+import  apiClient  from '@/api/axios'
 
 export const useAuthStore = defineStore('auth',  {
     state:() =>({
@@ -14,36 +15,50 @@ export const useAuthStore = defineStore('auth',  {
         getAuthToken: (state) => state.token,
     },
     actions: {
+        setAuth({ user, token}){
+            this.user = user;
+            this.token = token;
+            localStorage.getItem('authToken', token);
+            if(user){
+                localStorage.getItem('authUser', JSON.stringify(user));
+            }
+        },
         checkAuth(){
             const token = localStorage.getItem('authToken');
-            if(token){
-                // トークンを使ってユーザー情報を取得または検証するAPI呼び出しなど
-                // 例：this.fetchUserProfile(token)
-                this.token = token; // 刈りでトークンをセット
-                // 実際には、トークンが有効か確認し、ユーザー情報を取得する必要がある
-                // this.user = { name: '復元ユーザー'};
-                // 仮でユーザーをセット
-                console.log('Auth state restored from localStroge')
+            const userJson = localStorage.getItem('authUser');
+            if(token && userJson){
+                try{
+                    const user = JSON.parse(userJson);
+                    this.user = user;
+                    this.token = token;
+                    console.log('Auth state restored from localStroge')
+                } catch(e){
+                    console.log('Login failed:', e)
+                    this.logout();
+                }finally{
+                    this.logout();
+                }
             }
         },
         async login(credentials){ // {{email, password}
             this.isLoading = true;
             this.error = null;
             try{
-                const response = await axios.post(baseUrl, credentials);
-                const { access_token, user} = response.data;
-                this.user = user;
-                this.token = access_token;
-                localStorage.setItem('authToken', access_token)
+                const response = await apiClient.post('/token', credentials);
+                // FastAPIのOAuth2では　{access_token:'...',tokentype:'bearer',...,user_info:{...}}
+                const { access_token, user_info} = response.data;
+                this.setAuth({user:user_info, token:access_token})
+
+             //   localStorage.setItem('authToken', access_token)
 
                 console.log('Login successful!')
+                return true;
             } catch(err){
                 console.log('Login failed:', err)
                 this.error = err;
-                this.user = null;
-                this.token = null;
+                this.logout();
                 // 保存したトークンがあれば削除
-                localStorage.removeItem('authToken')
+             //   localStorage.removeItem('authToken')
                 throw err; // エラーを呼び出し元に伝える
             }finally{
                 this.isLoading = false;
@@ -54,6 +69,7 @@ export const useAuthStore = defineStore('auth',  {
             this.token = null;
             // 保存したトークンがあれば削除
             localStorage.removeItem('authToken');
+            localStorage.removeItem('authUser');
             console.log('Logged out')
         },
     },
