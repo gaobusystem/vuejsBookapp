@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 // import router from '@/router'; // リダイレクトに使用
-import { useNotificationStore}} from '@/stores/notification'; // 通知に使用
+import { useNotificationStore} from '@/stores/notification'; // 通知に使用
 // import { useAuthStore} from '@/stores/auth'; // 認証ストアに使用
 
 const apiClient = axios.create({
